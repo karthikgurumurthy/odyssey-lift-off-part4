@@ -1,18 +1,43 @@
-import React from 'react';
-import styled from '@emotion/styled';
-import { colors, mq } from '../styles';
-import { humanReadableTimeFromSeconds } from '../utils/helpers';
-import { Link } from '@reach/router';
+import React from 'react'
+import styled from '@emotion/styled'
+import { colors, mq } from '../styles'
+import { humanReadableTimeFromSeconds } from '../utils/helpers'
+import { Link } from '@reach/router'
+import { gql, useMutation } from '@apollo/client'
+
+/**
+ * Mutation to increment a track's number of views
+ */
+const INCREMENT_TRACK_VIEWS = gql`
+  mutation IncrementTrackViews($incrementTrackViewsId: ID!) {
+    incrementTrackViews(id: $incrementTrackViewsId) {
+      code
+      success
+      message
+      track {
+        id
+        numberOfViews
+      }
+    }
+  }
+`
 
 /**
  * Track Card component renders basic info in a card format
  * for each track populating the tracks grid homepage.
  */
 const TrackCard = ({ track }) => {
-  const { title, thumbnail, author, length, modulesCount, id } = track;
+  const { title, thumbnail, author, length, modulesCount, id } = track
+
+  const [incrementTrackViews] = useMutation(INCREMENT_TRACK_VIEWS, {
+    variables: { incrementTrackViewsId: id },
+    onCompleted: (data) => {
+      console.log(data)
+    },
+  })
 
   return (
-    <CardContainer to={`/track/${id}`}>
+    <CardContainer to={`/track/${id}`} onClick={incrementTrackViews}>
       <CardContent>
         <CardImageContainer>
           <CardImage src={thumbnail} alt={title} />
@@ -31,10 +56,10 @@ const TrackCard = ({ track }) => {
         </CardBody>
       </CardContent>
     </CardContainer>
-  );
-};
+  )
+}
 
-export default TrackCard;
+export default TrackCard
 
 /** Track Card styled components */
 const CardContainer = styled(Link)({
@@ -65,14 +90,14 @@ const CardContainer = styled(Link)({
   },
   cursor: 'pointer',
   textDecoration: 'none',
-});
+})
 
 const CardContent = styled.div({
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-around',
   height: '100%',
-});
+})
 
 const CardTitle = styled.h3({
   textAlign: 'center',
@@ -81,7 +106,7 @@ const CardTitle = styled.h3({
   fontWeight: 700,
   color: colors.text,
   flex: 1,
-});
+})
 
 const CardImageContainer = styled.div({
   height: 220,
@@ -95,14 +120,14 @@ const CardImageContainer = styled.div({
     right: 0,
     background: 'rgba(250,0,150,0.20)',
   },
-});
+})
 
 const CardImage = styled.img({
   objectFit: 'cover',
   width: '100%',
   height: '100%',
   filter: 'grayscale(60%)',
-});
+})
 
 const CardBody = styled.div({
   padding: 18,
@@ -111,12 +136,12 @@ const CardBody = styled.div({
   color: colors.textSecondary,
   flexDirection: 'column',
   justifyContent: 'space-around',
-});
+})
 
 const CardFooter = styled.div({
   display: 'flex',
   flexDirection: 'Row',
-});
+})
 
 const AuthorImage = styled.img({
   height: 30,
@@ -124,19 +149,19 @@ const AuthorImage = styled.img({
   marginRight: 8,
   borderRadius: '50%',
   objectFit: 'cover',
-});
+})
 
 const AuthorAndTrack = styled.div({
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-between',
-});
+})
 
 const AuthorName = styled.div({
   lineHeight: '1em',
   fontSize: '1.1em',
-});
+})
 
 const TrackLength = styled.div({
   fontSize: '0.8em',
-});
+})
